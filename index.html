@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Will You Be My Valentine?</title>
+    <style>
+        /* === GLOBAL STYLES === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ffccd5, #ffafcc);
+            color: #5a3d5c;
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding: 15px;
+            touch-action: manipulation;
+        }
+
+        /* === SCREEN MANAGEMENT === */
+        .screen {
+            min-height: calc(100vh - 30px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 15px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            pointer-events: none;
+        }
+
+        .screen.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all;
+            position: relative;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 25px 20px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(255, 107, 139, 0.25);
+            border: 3px solid #ff6b8b;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #ff6b8b;
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            font-weight: bold;
+            line-height: 1.3;
+        }
+
+        h2 {
+            color: #ff6b8b;
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+        }
+
+        h3 {
+            color: #ff6b8b;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        /* === BUTTONS === */
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 25px;
+            width: 100%;
+        }
+
+        .yes-btn, .no-btn, .submit-btn, .next-btn, .poem-btn, .restart-btn, 
+        .start-btn, .shoot-btn, .control-btn, .endless-btn, .normal-btn,
+        .yes-proposal, .no-proposal {
+            padding: 16px 20px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            min-height: 50px;
+            width: 100%;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .yes-btn, .submit-btn, .next-btn, .poem-btn, .restart-btn, 
+        .start-btn, .shoot-btn, .yes-proposal, .endless-btn {
+            background: linear-gradient(45deg, #ff6b8b, #ff9a8b);
+            color: white;
+        }
+
+        .no-btn, .no-proposal, .normal-btn {
+            background: #ffccd5;
+            color: #ff6b8b;
+            border: 2px solid #ffafcc;
+        }
+
+        .yes-btn:hover, .no-btn:hover, .submit-btn:hover, .next-btn:hover, 
+        .poem-btn:hover, .restart-btn:hover, .start-btn:hover, .shoot-btn:hover,
+        .yes-proposal:hover, .no-proposal:hover, .control-btn:hover,
+        .endless-btn:hover, .normal-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(255, 107, 139, 0.4);
+        }
+
+        /* === GAME BOXES === */
+        .game-box {
+            background: #fff5f7;
+            border-radius: 15px;
+            padding: 20px 15px;
+            margin: 20px 0;
+            border: 2px solid #ffafcc;
+            width: 100%;
+        }
+
+        .game-description {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+
+        /* === GAME 1: LOVE QUIZ === */
+        .quiz-question {
+            text-align: left;
+            margin: 15px 0;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #ff6b8b;
+        }
+
+        .quiz-question h4 {
+            color: #ff6b8b;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ffccd5;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin: 8px 0;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #ff6b8b;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .options label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 12px 15px;
+            background: #ffeff3;
+            border-radius: 8px;
+            transition: 0.2s;
+            text-align: left;
+            min-height: 44px;
+            user-select: none;
+        }
+
+        /* === GAME 3: HEART POP === */
+        .game-stats-bar {
+            display: flex;
+            justify-content: space-around;
+            background: #fff5f7;
+            padding: 12px;
+            border-radius: 12px;
+            margin: 15px 0;
+            border: 2px solid #ffafcc;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            color: #ff6b8b;
+            font-size: 1.1rem;
+        }
+
+        .game-area {
+            position: relative;
+            height: 350px;
+            background: #fff0f3;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 3px solid #ffafcc;
+            overflow: hidden;
+        }
+
+        .pop-heart {
+            position: absolute;
+            font-size: 2.5rem;
+            cursor: pointer;
+            animation: float 3s infinite;
+            transition: transform 0.2s;
+        }
+
+        .pop-cat {
+            position: absolute;
+            cursor: pointer;
+            animation: float 3s infinite;
+            transition: transform 0.2s;
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #ff6b8b;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .pop-heart:hover, .pop-cat:hover {
+            transform: scale(1.2);
+        }
+
+        .pop-heart.popped, .pop-cat.popped {
+            animation: pop 0.5s forwards;
+        }
+
+        /* === PROPOSAL SCREEN === */
+        .big-question {
+            font-size: 1.8rem;
+            color: #ff6b8b;
+            margin: 30px 0;
+            animation: heartbeat 1.5s infinite;
+            line-height: 1.4;
+            padding: 0 10px;
+        }
+
+        .proposal-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 30px 0;
+            width: 100%;
+        }
+
+        .yes-proposal {
+            padding: 20px 15px;
+            font-size: 1.5rem;
+            border-radius: 15px;
+            cursor: pointer;
+            min-height: 60px;
+        }
+
+        .no-proposal {
+            padding: 15px 10px;
+            font-size: 1.2rem;
+            border-radius: 12px;
+            cursor: pointer;
+            min-height: 50px;
+        }
+
+        /* === CELEBRATION SCREEN === */
+        .celebrate-title {
+            color: #ff6b8b;
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            animation: bounce 1s infinite;
+            padding: 0 10px;
+            line-height: 1.3;
+        }
+
+        #cat-celebration {
+            margin: 20px 0;
+            font-size: 5rem;
+            animation: dance 2s infinite;
+        }
+
+        .sticker-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+
+        .sticker {
+            font-size: 2.5rem;
+            animation: float 3s infinite ease-in-out;
+        }
+
+        /* === POEM SCREEN === */
+        .poem-container {
+            max-width: 500px;
+        }
+
+        .poem {
+            text-align: center;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin: 25px 0;
+            padding: 20px 15px;
+            background: #fff5f7;
+            border-radius: 15px;
+            border-left: 4px solid #ff6b8b;
+            border-right: 4px solid #ff6b8b;
+        }
+
+        .signature {
+            font-style: italic;
+            color: #ff6b8b;
+            font-size: 1.2rem;
+            margin-top: 20px;
+        }
+
+        /* === ERROR MESSAGES === */
+        .error {
+            color: #ff4444;
+            background: #ffeeee;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border: 2px solid #ff4444;
+            font-size: 0.9rem;
+        }
+
+        .hint {
+            font-size: 0.85rem;
+            color: #888;
+            font-style: italic;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* === GAME OVER MODAL === */
+        .game-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .game-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .game-overlay-content {
+            background: white;
+            padding: 30px 25px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 90%;
+            width: 400px;
+            border: 4px solid #ff4444;
+            box-shadow: 0 10px 30px rgba(255, 0, 0, 0.3);
+        }
+
+        .game-overlay-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .overlay-btn {
+            padding: 15px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .overlay-btn.restart-btn {
+            background: linear-gradient(45deg, #ff6b8b, #ff9a8b);
+            color: white;
+        }
+
+        .overlay-btn.skip-btn {
+            background: #666;
+            color: white;
+        }
+
+        .overlay-hint {
+            margin-top: 15px;
+            font-style: italic;
+            color: #ff6b8b;
+            font-size: 0.9rem;
+        }
+
+        /* === ACCESS DENIED OVERLAY === */
+        .no-overlay, .block-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .no-overlay.active, .block-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .no-overlay {
+            background: linear-gradient(45deg, #8b0000, #ff0000);
+        }
+
+        .block-overlay {
+            background: repeating-linear-gradient(45deg, #000, #000 20px, #ff0000 20px, #ff0000 40px);
+            animation: shake 0.5s infinite;
+        }
+
+        .no-overlay-content, .block-overlay-content {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 90%;
+            border: 5px solid #ff4444;
+            box-shadow: 0 0 50px #ff0000;
+        }
+
+        .no-overlay-content h1, .block-overlay-content h1 {
+            color: #ff4444;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .no-overlay-content p, .block-overlay-content p {
+            color: white;
+            font-size: 1.3rem;
+            margin: 20px 0;
+        }
+
+        .no-overlay-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .no-overlay-buttons button, .block-overlay-content button {
+            background: linear-gradient(45deg, #ff6b8b, #ff9a8b);
+            color: white;
+            border: none;
+            padding: 18px 30px;
+            font-size: 1.1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            min-width: 250px;
+        }
+
+        .block-overlay-content button {
+            background: linear-gradient(45deg, #ff0000, #8b0000);
+        }
+
+        /* === ENDLESS MODE BUTTONS === */
+        .endless-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .endless-exit-btn {
+            background: linear-gradient(45deg, #666, #999) !important;
+        }
+
+        /* === ANIMATIONS === */
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        @keyframes dance {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-50px); opacity: 0; }
+        }
+
+        @keyframes celebrate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* === RESPONSIVE === */
+        @media (min-width: 768px) {
+            body { padding: 20px; }
+            .container { padding: 35px 30px; max-width: 600px; }
+            h1 { font-size: 2.2rem; margin-bottom: 35px; }
+            h2 { font-size: 1.8rem; }
+            .buttons { flex-direction: row; gap: 20px; }
+            .yes-btn, .no-btn, .submit-btn, .next-btn, .poem-btn, .restart-btn, 
+            .start-btn, .shoot-btn, .control-btn, .endless-btn, .normal-btn,
+            .yes-proposal, .no-proposal {
+                padding: 18px 25px; font-size: 1.2rem; width: auto; flex: 1; min-width: 150px;
+            }
+            .game-box { padding: 25px 20px; }
+            .game-area { height: 400px; }
+            .big-question { font-size: 2.5rem; }
+            .proposal-buttons { flex-direction: row; gap: 20px; }
+            .yes-proposal { font-size: 2rem; padding: 25px 40px; }
+            .no-proposal { font-size: 1.5rem; padding: 20px 30px; }
+            .sticker { font-size: 3rem; }
+            .poem { font-size: 1.2rem; padding: 25px 20px; }
+            .options { flex-direction: row; flex-wrap: wrap; }
+            .options label { flex: 1; min-width: 120px; justify-content: center; text-align: center; }
+            .game-overlay-content { width: 450px; }
+            .pop-cat { width: 50px; height: 50px; }
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 1.6rem; }
+            .container { padding: 20px 15px; }
+            .yes-btn, .no-btn, .submit-btn, .next-btn, .poem-btn, .restart-btn,
+            .start-btn, .shoot-btn, .control-btn, .endless-btn, .normal-btn,
+            .yes-proposal, .no-proposal {
+                padding: 14px 15px; font-size: 1rem;
+            }
+            .game-area { height: 300px; }
+            .game-overlay-content { padding: 20px 15px; }
+            .overlay-btn { padding: 12px 15px; font-size: 1rem; }
+            .pop-cat { width: 35px; height: 35px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- SCREEN 1: Initial Question -->
+    <div class="screen active" id="screen1">
+        <div class="container">
+            <h1><i class="fas fa-heart"></i> Are you my girl? <i class="fas fa-heart"></i></h1>
+            <div class="buttons">
+                <button class="yes-btn" onclick="showScreen('screen2')">
+                    <i class="fas fa-heart"></i> ofc
+                </button>
+                <button class="no-btn" onclick="showNoScreen()">
+                    not yet... <i class="fas fa-smile-wink"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 2: Game 1 - Love Quiz -->
+    <div class="screen" id="screen2">
+        <div class="container">
+            <h2><i class="fas fa-gamepad"></i> Game 1: Love Quiz</h2>
+            <p class="subtitle">Answer these questions about me!</p>
+            
+            <div class="game-box">
+                <div class="quiz-question">
+                    <h4>1. What's my name?</h4>
+                    <input type="text" id="q1" placeholder="Type my name...">
+                </div>
+                
+                <div class="quiz-question">
+                    <h4>2. What's my favorite color? (Pick one)</h4>
+                    <div class="options">
+                        <label><input type="radio" name="color" value="black"> Black</label>
+                        <label><input type="radio" name="color" value="Green"> Green</label>
+                        <label><input type="radio" name="color" value="pink"> Pink</label>
+                        <label><input type="radio" name="color" value="blue"> Blue</label>
+                        <label><input type="radio" name="color" value="red"> Red</label>
+                    </div>
+                </div>
+                
+                <div class="quiz-question">
+                    <h4>3. What's our inside joke word?</h4>
+                    <input type="text" id="q3" placeholder="Type the word...">
+                    <p class="hint">Hint: We created this word on your brother's prom day</p>
+                </div>
+                
+                <div class="quiz-question">
+                    <h4>4. What's my favorite food? (Pick one)</h4>
+                    <div class="options">
+                        <label><input type="radio" name="food" value="Fajitas"> Fajitas</label>
+                        <label><input type="radio" name="food" value="pizza"> Pizza</label>
+                        <label><input type="radio" name="food" value="burger"> Burger</label>
+                        <label><input type="radio" name="food" value="sushi"> Sushi</label>
+                    </div>
+                </div>
+                
+                <button class="submit-btn" onclick="checkQuiz()">
+                    Submit Answers <i class="fas fa-check"></i>
+                </button>
+                <p class="error hidden" id="quiz-error">
+                    <i class="fas fa-times-circle"></i> Wrong answer! Are you sure you're my girl? 😤
+                </p>
+            </div>
+
+            <div class="buttons">
+                <button class="no-btn" onclick="showScreen('screen1')">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 3: Game 3 - Heart Pop Challenge -->
+    <div class="screen" id="screen3">
+        <div class="container">
+            <h2><i class="fas fa-bomb"></i> Game 2: Heart Pop Challenge</h2>
+            <p class="game-description">Pop 20 items (hearts and cats!) in 30 seconds!</p>
+            
+            <div class="game-stats-bar">
+                <div class="stat-item">
+                    <i class="fas fa-clock"></i>
+                    Time Left: <span id="timer3">30</span>s
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-heart"></i>
+                    Popped: <span id="popped3">0</span>/20
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-star"></i>
+                    High Score: <span id="highscore3">0</span>
+                </div>
+            </div>
+            
+            <div class="game-area" id="game-area3">
+                <!-- Hearts and cats will appear here -->
+            </div>
+            
+            <div class="buttons">
+                <button class="start-btn" id="start-game3">
+                    <i class="fas fa-play"></i> Start Normal Mode
+                </button>
+                <button class="endless-btn" id="endless-game3">
+                    <i class="fas fa-infinity"></i> Start Endless Mode
+                </button>
+                <div class="endless-controls hidden" id="endless-controls">
+                    <button class="normal-btn" onclick="exitEndlessMode()">
+                        <i class="fas fa-sign-out-alt"></i> Exit Endless
+                    </button>
+                    <button class="yes-btn" onclick="continueEndlessMode()">
+                        <i class="fas fa-play"></i> Continue
+                    </button>
+                </div>
+                <button class="no-btn" onclick="showScreen('screen2')">
+                    <i class="fas fa-arrow-left"></i> Previous Game
+                </button>
+                <button class="yes-btn hidden" id="next-game3" onclick="showScreen('screen4')">
+                    Final Question <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 4: Valentine Proposal -->
+    <div class="screen" id="screen4">
+        <div class="container">
+            <h2><i class="fas fa-heart"></i> Now that you've completed all games...</h2>
+            <h1 class="big-question">Will you be my Valentine? 💝</h1>
+            
+            <div class="proposal-buttons">
+                <button class="yes-proposal" id="yes-btn" onclick="sheSaidYes()">
+                    YES! <i class="fas fa-heart"></i>
+                </button>
+                <button class="no-proposal" id="no-btn" onclick="noClicked()">
+                    <span id="no-text">No</span>
+                </button>
+            </div>
+            
+            <div class="hearts-container" id="hearts"></div>
+            
+            <div class="buttons">
+                <button class="no-btn" onclick="showScreen('screen3')">
+                    <i class="fas fa-arrow-left"></i> Previous Game
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 5: Celebration -->
+    <div class="screen" id="screen5">
+        <div class="container">
+            <h1 class="celebrate-title">
+                <i class="fas fa-heart"></i> SHE SAID YES! <i class="fas fa-heart"></i>
+            </h1>
+            
+            <div class="sticker-container">
+                <div class="sticker">💕</div>
+                <div class="sticker">🥰</div>
+                <div class="sticker">😍</div>
+                <div class="sticker">💝</div>
+            </div>
+            
+            <div id="cat-celebration">🐱🎉</div>
+            
+            <p class="celebrate-text">You've made me the happiest guy ever!</p>
+            
+            <div class="buttons">
+                <button class="poem-btn" onclick="showScreen('screen6')">
+                    <i class="fas fa-gift"></i> Claim Your Reward
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 6: Your Poem -->
+    <div class="screen" id="screen6">
+        <div class="container poem-container">
+            <h2><i class="fas fa-heart"></i> For My Valentine <i class="fas fa-heart"></i></h2>
+            
+        <div class="poem">
+            <p>You came so softly, yet you changed my days,</p>
+            <p>Turned every quiet thought into your light.</p>
+            <p>Now everything I do just finds your ways,</p>
+            <p>Like loving you is what I do right.</p>
+            <br>
+            <p>The way you love me leaves me out of breath,</p>
+            <p>Like my small heart can barely hold it all.</p>
+            <p>You fill the empty spaces I once kept,</p>
+            <p>And catch me gently every time I fall.</p>
+            <br>
+            <p>I wake up and your name is on my mind,</p>
+            <p>I sleep and somehow dream of you again.</p>
+            <p>When something happens, worry I can’t hide,</p>
+            <p>My clumsy girl — my joy, my calm, my when.</p>
+            <br>
+            <p>Your brown hair curls, then falls so straight and sleek,</p>
+            <p>But either way you steal away my air.</p>
+            <p>Those brown eyes pull me in; I grow so weak,</p>
+            <p>I’d lose myself forever in that stare.</p>
+            <br>
+            <p>We barely argue, barely even break,</p>
+            <p>Like something in our souls just fits so tight.</p>
+            <p>No matter what this world may try to shake,</p>
+            <p>I’ll choose you every morning, every night.</p>
+            <br>
+            <p class="signature">- Paolo</p>
+        </div>
+            <div class="buttons">
+                <button class="restart-btn" onclick="showScreen('screen1')">
+                    <i class="fas fa-redo"></i> Play Again
+                </button>
+                <button class="endless-btn" onclick="showScreen('screen3')">
+                    <i class="fas fa-gamepad"></i> Play More Games
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div class="game-overlay" id="game-overlay">
+        <div class="game-overlay-content">
+            <h3 id="game-over-title">Game Over!</h3>
+            <p id="game-over-message"></p>
+            <p class="game-overlay-stats" id="game-over-stats"></p>
+            <div class="game-overlay-buttons">
+                <button onclick="restartCurrentGame()" class="overlay-btn restart-btn">
+                    <i class="fas fa-redo"></i> Try Again
+                </button>
+                <button onclick="skipGame()" class="overlay-btn skip-btn">
+                    Skip <i class="fas fa-forward"></i>
+                </button>
+            </div>
+            <p class="overlay-hint">
+                <i class="fas fa-heart"></i> only cz ur my girl bb
+            </p>
+        </div>
+    </div>
+
+    <!-- No Screen Overlay -->
+    <div class="no-overlay" id="no-overlay">
+        <div class="no-overlay-content">
+            <h1>🚨 WRONG ANSWER! 🚨</h1>
+            <p>"Then what are you doing here?"</p>
+            <div class="no-overlay-buttons">
+                <button onclick="goBackToStart()">
+                    OK, I'll click "ofc" instead 💖
+                </button>
+                <button onclick="blockUser()">
+                    Never, get me out! 🚪
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Block Screen -->
+    <div class="block-overlay" id="block-overlay">
+        <div class="block-overlay-content">
+            <h1>⛔ ACCESS DENIED! ⛔</h1>
+            <p>You chose "Never" so you're stuck here!</p>
+            <button onclick="unblockUser()">
+                OK, I'll click "ofc"! 😅
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // === GLOBAL STATE ===
+        let currentScreen = 'screen1';
+        let currentGame = 1;
+        let noClicks = 0;
+
+        // === GAME 3: HEART POP (NOW WITH CATS!) ===
+        let game3Active = false;
+        let game3Interval;
+        let game3Timer;
+        let game3Time = 30;
+        let poppedItems = 0; // Changed from poppedHearts to poppedItems
+        let game3HighScore = 0;
+        let game3IsEndless = false;
+        let game3Score = 0; // For endless mode score tracking
+        let endlessModeActive = false;
+
+        // === SCREEN MANAGEMENT ===
+        function showScreen(screenId) {
+            // Hide current screen
+            document.querySelector('.screen.active').classList.remove('active');
+            
+            // Show new screen
+            document.getElementById(screenId).classList.add('active');
+            currentScreen = screenId;
+            
+            // Update current game based on screen
+            switch(screenId) {
+                case 'screen1': currentGame = 0; break;
+                case 'screen2': currentGame = 1; break;
+                case 'screen3': currentGame = 3; break;
+            }
+            
+            // Reset game 3 if coming back to it
+            if (screenId === 'screen3') {
+                resetGame3();
+            }
+        }
+
+        // === SCREEN 1: INITIAL QUESTION ===
+        function showNoScreen() {
+            document.getElementById('no-overlay').classList.add('active');
+        }
+
+        function goBackToStart() {
+            document.getElementById('no-overlay').classList.remove('active');
+            const yesBtn = document.querySelector('.yes-btn');
+            yesBtn.style.animation = 'pulse 0.5s infinite';
+            yesBtn.style.boxShadow = '0 0 30px #ff6b8b';
+        }
+
+        function blockUser() {
+            document.getElementById('no-overlay').classList.remove('active');
+            document.getElementById('block-overlay').classList.add('active');
+        }
+
+        function unblockUser() {
+            document.getElementById('block-overlay').classList.remove('active');
+            const yesBtn = document.querySelector('.yes-btn');
+            yesBtn.style.animation = 'pulse 0.5s infinite';
+            yesBtn.style.boxShadow = '0 0 30px #ff6b8b';
+        }
+
+        // === GAME 1: LOVE QUIZ ===
+        function checkQuiz() {
+            const q1 = document.getElementById('q1').value.toLowerCase();
+            const q3 = document.getElementById('q3').value.toLowerCase();
+            const selectedColor = document.querySelector('input[name="color"]:checked');
+            const selectedFood = document.querySelector('input[name="food"]:checked');
+            
+            const correctAnswers = q1 === "paolo" && 
+                                 selectedColor && selectedColor.value.toLowerCase() === "green" && 
+                                 selectedFood && selectedFood.value.toLowerCase() === "fajitas" && 
+                                 q3 === "batata";
+            
+            if (correctAnswers) {
+                showScreen('screen3');
+            } else {
+                const errorElement = document.getElementById('quiz-error');
+                errorElement.classList.remove('hidden');
+                errorElement.style.animation = 'shake 0.5s';
+                setTimeout(() => errorElement.style.animation = '', 500);
+            }
+        }
+
+        // === GAME 3: HEART & CAT POP ===
+        function resetGame3() {
+            game3Active = false;
+            game3IsEndless = false;
+            endlessModeActive = false;
+            poppedItems = 0;
+            game3Score = 0;
+            
+            clearInterval(game3Interval);
+            clearInterval(game3Timer);
+            
+            const gameArea = document.getElementById('game-area3');
+            gameArea.innerHTML = '';
+            
+            document.getElementById('start-game3').classList.remove('hidden');
+            document.getElementById('endless-game3').classList.remove('hidden');
+            document.getElementById('endless-controls').classList.add('hidden');
+            document.getElementById('next-game3').classList.add('hidden');
+            
+            document.getElementById('timer3').textContent = '30';
+            document.getElementById('popped3').textContent = '0';
+            document.getElementById('highscore3').textContent = game3HighScore;
+        }
+
+        function initGame3() {
+            const startBtn = document.getElementById('start-game3');
+            const endlessBtn = document.getElementById('endless-game3');
+            
+            startBtn.addEventListener('click', () => {
+                game3IsEndless = false;
+                endlessModeActive = false;
+                startGame3(30);
+            });
+            
+            endlessBtn.addEventListener('click', () => {
+                game3IsEndless = true;
+                endlessModeActive = true;
+                startGame3(99999); // No time limit
+            });
+        }
+
+        function startGame3(timeLimit) {
+            game3Active = true;
+            game3Time = timeLimit;
+            poppedItems = 0;
+            game3Score = 0;
+            
+            // Reset UI
+            document.getElementById('start-game3').classList.add('hidden');
+            document.getElementById('endless-game3').classList.add('hidden');
+            document.getElementById('next-game3').classList.add('hidden');
+            document.getElementById('game-overlay').classList.remove('active');
+            
+            if (game3IsEndless) {
+                document.getElementById('endless-controls').classList.remove('hidden');
+            } else {
+                document.getElementById('endless-controls').classList.add('hidden');
+            }
+            
+            const gameArea = document.getElementById('game-area3');
+            gameArea.innerHTML = '';
+            
+            // Update displays
+            document.getElementById('timer3').textContent = game3IsEndless ? '∞' : game3Time;
+            document.getElementById('popped3').textContent = '0';
+            document.getElementById('highscore3').textContent = game3HighScore;
+            
+            // Timer (only for normal mode)
+            if (!game3IsEndless) {
+                game3Timer = setInterval(() => {
+                    if (!game3Active) return;
+                    
+                    game3Time--;
+                    document.getElementById('timer3').textContent = game3Time;
+                    
+                    if (game3Time <= 0) {
+                        if (poppedItems >= 20) {
+                            winGame3();
+                        } else {
+                            gameOver(`Time's up! You popped ${poppedItems}/20 items.`);
+                        }
+                    }
+                }, 1000);
+            }
+            
+            // Spawn items (hearts and cats)
+            game3Interval = setInterval(() => {
+                if (!game3Active) return;
+                
+                spawnPopItem();
+                
+                // Win condition for normal mode
+                if (!game3IsEndless && poppedItems >= 20) {
+                    winGame3();
+                }
+            }, 700); // Slightly faster spawning
+            
+            // Initial items
+            for (let i = 0; i < 10; i++) {
+                setTimeout(spawnPopItem, i * 250);
+            }
+        }
+
+        function spawnPopItem() {
+            if (!game3Active) return;
+            
+            const gameArea = document.getElementById('game-area3');
+            const isCat = Math.random() < 0.3; // 30% chance of being a cat
+            
+            let item;
+            if (isCat) {
+                // Create a cat image
+                item = document.createElement('img');
+                item.src = 'cat.jpg';
+                item.className = 'pop-cat';
+                item.alt = 'Cute cat';
+            } else {
+                // Create a heart
+                item = document.createElement('div');
+                item.className = 'pop-heart';
+                item.textContent = '💖';
+                item.style.fontSize = (Math.random() * 15 + 25) + 'px';
+            }
+            
+            item.style.left = Math.random() * 85 + 5 + '%';
+            item.style.top = Math.random() * 85 + 5 + '%';
+            
+            item.addEventListener('click', function popItem() {
+                if (!game3Active || item.classList.contains('popped')) return;
+                
+                item.classList.add('popped');
+                poppedItems++;
+                game3Score++;
+                document.getElementById('popped3').textContent = poppedItems;
+                
+                // Update high score if needed
+                if (game3Score > game3HighScore) {
+                    game3HighScore = game3Score;
+                    document.getElementById('highscore3').textContent = game3HighScore;
+                }
+                
+                // Create pop effect
+                const pop = document.createElement('div');
+                pop.textContent = '+1';
+                pop.style.position = 'absolute';
+                pop.style.left = item.style.left;
+                pop.style.top = item.style.top;
+                pop.style.color = isCat ? '#ff9a8b' : '#ff6b8b';
+                pop.style.fontWeight = 'bold';
+                pop.style.fontSize = '1.5rem';
+                pop.style.animation = 'floatUp 1s forwards';
+                gameArea.appendChild(pop);
+                
+                setTimeout(() => pop.remove(), 1000);
+                
+                setTimeout(() => {
+                    if (item.parentNode) {
+                        item.remove();
+                    }
+                }, 500);
+            });
+            
+            gameArea.appendChild(item);
+            
+            // Auto-remove after 8 seconds
+            setTimeout(() => {
+                if (item.parentNode && !item.classList.contains('popped')) {
+                    item.remove();
+                    // In endless mode, reduce score for missed items
+                    if (game3IsEndless && game3Score > 0) {
+                        game3Score--;
+                        document.getElementById('highscore3').textContent = game3HighScore;
+                    }
+                }
+            }, 8000);
+        }
+
+        function winGame3() {
+            game3Active = false;
+            clearInterval(game3Interval);
+            clearInterval(game3Timer);
+            
+            // Update high score
+            if (poppedItems > game3HighScore) {
+                game3HighScore = poppedItems;
+                document.getElementById('highscore3').textContent = game3HighScore;
+            }
+            
+            // Show celebration
+            const gameArea = document.getElementById('game-area3');
+            const winMsg = document.createElement('div');
+            winMsg.innerHTML = '🎉 You Win! 🎉';
+            winMsg.style.position = 'absolute';
+            winMsg.style.top = '50%';
+            winMsg.style.left = '50%';
+            winMsg.style.transform = 'translate(-50%, -50%)';
+            winMsg.style.fontSize = '2rem';
+            winMsg.style.color = '#ff6b8b';
+            winMsg.style.fontWeight = 'bold';
+            winMsg.style.animation = 'celebrate 2s infinite';
+            gameArea.appendChild(winMsg);
+            
+            // Show next button after 2 seconds
+            setTimeout(() => {
+                document.getElementById('next-game3').classList.remove('hidden');
+            }, 2000);
+        }
+
+        function exitEndlessMode() {
+            game3Active = false;
+            clearInterval(game3Interval);
+            clearInterval(game3Timer);
+            
+            const gameArea = document.getElementById('game-area3');
+            const finalScore = document.createElement('div');
+            finalScore.innerHTML = `🏆 Final Score: ${game3Score}<br>⭐ High Score: ${game3HighScore}`;
+            finalScore.style.position = 'absolute';
+            finalScore.style.top = '50%';
+            finalScore.style.left = '50%';
+            finalScore.style.transform = 'translate(-50%, -50%)';
+            finalScore.style.fontSize = '1.8rem';
+            finalScore.style.color = '#ff6b8b';
+            finalScore.style.fontWeight = 'bold';
+            finalScore.style.textAlign = 'center';
+            finalScore.style.animation = 'celebrate 2s infinite';
+            gameArea.appendChild(finalScore);
+            
+            // Show restart options after 3 seconds
+            setTimeout(() => {
+                resetGame3();
+            }, 3000);
+        }
+
+        function continueEndlessMode() {
+            // Just continue playing - nothing needed here
+        }
+
+        // === GAME MANAGEMENT ===
+        function gameOver(message, stats = '') {
+            // Stop all game loops
+            game3Active = false;
+            
+            clearInterval(game3Interval);
+            clearInterval(game3Timer);
+            
+            document.getElementById('game-over-title').textContent = 'Game Over!';
+            document.getElementById('game-over-message').textContent = message;
+            document.getElementById('game-over-stats').textContent = stats;
+            document.getElementById('game-overlay').classList.add('active');
+        }
+
+        function restartCurrentGame() {
+            document.getElementById('game-overlay').classList.remove('active');
+            
+            // Reset current game
+            switch(currentGame) {
+                case 3:
+                    resetGame3();
+                    break;
+            }
+        }
+
+        function skipGame() {
+            document.getElementById('game-overlay').classList.remove('active');
+            
+            // Skip to next screen based on current game
+            switch(currentGame) {
+                case 3: showScreen('screen4'); break;
+            }
+        }
+
+        // === PROPOSAL SCREEN ===
+        function noClicked() {
+            noClicks++;
+            const yesBtn = document.getElementById('yes-btn');
+            const noBtn = document.getElementById('no-btn');
+            const noText = document.getElementById('no-text');
+            
+            const currentSize = parseFloat(getComputedStyle(yesBtn).fontSize);
+            yesBtn.style.fontSize = (currentSize * 1.3) + 'px';
+            
+            const messages = ["No", "Maybe?", "Are you sure?", "Think about it!", "Pretty please?", "I'll keep asking!", "Last chance!"];
+            noBtn.style.fontSize = Math.max(14, 24 - (noClicks * 3)) + 'px';
+            noText.textContent = messages[Math.min(noClicks, messages.length - 1)];
+            
+            // Create floating hearts
+            const heart = document.createElement('div');
+            heart.textContent = '💖';
+            heart.style.position = 'absolute';
+            heart.style.fontSize = '2rem';
+            heart.style.animation = 'float 3s forwards';
+            heart.style.left = Math.random() * 80 + 10 + '%';
+            document.getElementById('hearts').appendChild(heart);
+            setTimeout(() => heart.remove(), 3000);
+            
+            if (noClicks >= 7) noBtn.style.display = 'none';
+        }
+
+        function sheSaidYes() {
+            showScreen('screen5');
+            
+            // Create confetti
+            const colors = ['#ff6b8b', '#ffccd5', '#ffafcc', '#ff9a8b'];
+            const catContainer = document.getElementById('cat-celebration');
+            
+            for (let i = 0; i < 50; i++) {
+                const piece = document.createElement('div');
+                piece.style.cssText = `
+                    position: absolute;
+                    width: 10px;
+                    height: 10px;
+                    background: ${colors[Math.floor(Math.random() * colors.length)]};
+                    top: -20px;
+                    left: ${Math.random() * 100}%;
+                    animation: fall ${Math.random() * 2 + 1}s linear forwards;
+                    border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+                    z-index: 100;
+                `;
+                catContainer.appendChild(piece);
+                setTimeout(() => piece.remove(), 3000);
+            }
+        }
+
+        // === INITIALIZATION ===
+        document.addEventListener('DOMContentLoaded', function() {
+            // Make sure only screen1 is active on load
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById('screen1').classList.add('active');
+            
+            // Add Font Awesome if not already present
+            if (!document.querySelector('link[href*="font-awesome"]')) {
+                const faLink = document.createElement('link');
+                faLink.rel = 'stylesheet';
+                faLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+                document.head.appendChild(faLink);
+            }
+            
+            // Initialize game
+            initGame3();
+            
+            // Allow Enter key for quiz
+            document.getElementById('q1')?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') checkQuiz();
+            });
+        });
+    </script>
+</body>
+</html>
